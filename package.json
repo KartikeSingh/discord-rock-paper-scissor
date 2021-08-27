@@ -1,0 +1,28 @@
+{
+  "name": "discord-rock-paper-scissor",
+  "version": "0.0.1",
+  "description": "An module to create Rock Paper Scissor game for discord bots",
+  "main": "src/index",
+  "scripts": {
+    "test": "node src/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KartikeSingh/discord-rock-paper-scissor.git"
+  },
+  "author": "shisui",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KartikeSingh/discord-rock-paper-scissor/issues"
+  },
+  "homepage": "https://github.com/KartikeSingh/discord-rock-paper-scissor#readme",
+  "keywords": [
+    "discord",
+    "games",
+    "rock paper scissor",
+    "rps"
+  ],
+  "dependencies": {
+    "discord.js": "^13.1.0"
+  }
+}
