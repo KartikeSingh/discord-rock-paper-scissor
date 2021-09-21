@@ -10,8 +10,10 @@ This package is created for making Rock Paper Scissor game for discord bots with
 This package is very easy to use and you can request new updates and stuff simple by messaging me on my [discord server](https://discord.gg/XYnMTQNTFh)
 
 # How?
+## Basic
 ```js
-const rps = require('discord-rock-paper-scissor');
+const RPS = require('discord-rock-paper-scissor');
+const rps = new RPS();
 
 /**
  * This method will start a Solo game between The message author and bot, everything is automatic <3
@@ -25,7 +27,36 @@ rps.solo(message,bot);
  * @param {Discord.Message} message The message object where command was used
  * @param {Discord.User} player2 The mentioned User / second player. Note it should be a discord user Object not guild member object
  */
-ttt.duo(message,player2);
+rps.duo(message,player2);
+```
+
+## Advanced
+```js
+const RPS = require('../../../../packages/discord-rock-paper-scissor/src');
+const rps = new RPS({
+    choiceReply: "You chose {move}",
+    endTitle: "Game ended very very victoriously for {winner}",
+    readyMessage: "Choose the dang moves kiddos",
+    drawEndTitle: "Bruh nerds ended up getting a draw",
+    choiceTitle: "Choose the move boiiiiiiiiiiiiiiiii",
+    choiceDescription: "I  hope that you can read than click on buttons to choose the move",
+    drawEndDescription: "{player1} chose : {player1move}\n\n{player2} chose : {player2move}\nStupid nerds arent they",
+    endDescription: "[Winner 👑] {winner}'s move : {winnermove}\n\n[Looser 🤮] {looser}'s move : {loosermove}"
+});
+
+/**
+ * This method will start a Solo game between The message author and bot, everything is automatic <3
+ * @param {Discord.Message} message The message object where command was used
+ * @param {Discord.Client} bot Your client object
+ */
+rps.solo(message,bot);
+
+/**
+ * This method will start a Duo game between The message author and Player 2, everything is automatic <3
+ * @param {Discord.Message} message The message object where command was used
+ * @param {Discord.User} player2 The mentioned User / second player. Note it should be a discord user Object not guild member object
+ */
+rps.duo(message,player2);
 ```
 
 # Example Images
