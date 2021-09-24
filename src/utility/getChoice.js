@@ -12,7 +12,7 @@ function getChoice(user, channel) {
             const row = new Discord.MessageActionRow().addComponents([new Discord.MessageButton().setCustomId("1_rock_paper_scissor").setStyle("PRIMARY").setEmoji("✊").setLabel("Rock"), new Discord.MessageButton().setCustomId("2_rock_paper_scissor").setStyle("PRIMARY").setEmoji("🖐").setLabel("Paper"), new Discord.MessageButton().setCustomId("3_rock_paper_scissor").setStyle("PRIMARY").setEmoji("✌").setLabel("Scissor")])
             let sent;
 
-            channel.send({ components: [row], embeds: [{ color: "FUCHSIA", title: this.choiceTitle, description: this.choiceDescription }] }).catch((e) => { rej(user) }).then(v => sent = v);
+            channel.send({ components: [row], embeds: [{ color: this.colors.choiceEmbed, title: this.choiceTitle, description: this.choiceDescription }] }).catch((e) => { rej(user) }).then(v => sent = v);
 
             const collector = channel.createMessageComponentCollector({ filter: (i) => i.user.id === user.id && (i.customId.endsWith("_rock_paper_scissor")) });
 
@@ -26,7 +26,6 @@ function getChoice(user, channel) {
 
             collector.once('end', (f, r) => res({ choice: getEmoji(r), message: sent }));
         } catch (e) {
-            console.log(e)
             rej(e);
         }
     })

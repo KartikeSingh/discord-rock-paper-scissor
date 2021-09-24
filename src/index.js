@@ -1,9 +1,12 @@
-const Discord = require('discord.js'), { getChoice, getEmoji } = require('./utility');
+const Discord = require('discord.js'),
+    { getChoice, getChoices, getEmoji } = require('./utility'),
+    color = require('./classes/color');
 
 class rps {
     /**
      * 
      * @param {Object} options The options for rock paper scissors
+     * @param {"dm" | "channel"} options.chooseIn Where should the bot message to ask for user's choice.
      * @param {String} options.readyMessage message to send while bot is waiting for users to choose their move.
      * @param {String} options.choiceTitle The title for embed sent in DM to get user's move.
      * @param {String} options.choiceDescription The description for embed sent in DM to get user's move.
@@ -12,8 +15,11 @@ class rps {
      * @param {String} options.drawEndDescription The description for embed sent if game is ended as an draw.
      * @param {String} options.endTitle The title for embed sent if game is not an draw.
      * @param {String} options.endDescription The description for embed sent if game is not an draw.
+     * @param {Colors} options.colors The colors for the embeds.
      */
     constructor(options = {}) {
+        this.colors = new color(options.colors);
+        this.chooseIn = options.chooseIn || "dm";
         this.readyMessage = options.readyMessage || "Choose your moves in DM";
         this.choiceTitle = options.choiceTitle || "Rock Paper Scissor";
         this.choiceDescription = options.choiceDescription || "Choose your move by clicking on the buttons";
@@ -22,6 +28,8 @@ class rps {
         this.drawEndDescription = options.drawEndDescription || "{player1} chose : {player1move}\n\n{player2} chose : {player2move}";
         this.endTitle = options.endTitle || "Game ended victoriously for {winner}"
         this.endDescription = options.endDescription || "{winner} [ Winner 👑 ] chose : {winnermove}\n\n{looser} [ Looser 👑 ] chose : {loosermove}\n\n"
+
+        if (this.chooseIn !== "dm" && this.chooseIn !== "channel") throw new Error("Choose in property should be either \"dm\" or \"channel\" but I got " + JSON.stringify(this.chooseIn));
     }
 
     /**
@@ -30,7 +38,6 @@ class rps {
      * @param {Discord.Client} bot The client object
      */
     async solo(message, bot) {
-        console.log(this);
         getChoice.bind(this)(message.author, message.channel).then(v => {
 
             const userChoice = v.choice;
@@ -40,11 +47,11 @@ class rps {
             let row = new Discord.MessageActionRow().addComponents(new Discord.MessageButton().setCustomId("y7ghjuiojioujoj").setDisabled(true).setStyle("SUCCESS").setEmoji("🕊").setLabel("Game Ended"))
 
             if (userChoice === choice) { // draw
-                sent.edit({ embeds: [{ color: "DARK_BUT_NOT_BLACK", title: this.drawEndTitle, description: this.drawEndDescription.replace(/{player1}/g, message.author.username).replace(/{player1move}/g, userChoice).replace(/{player2}/g, bot.user.username || "Bot").replace(/{player2move}/g, choice) }], components: [row] });
+                sent.edit({ embeds: [{ color: this.colors.drawEmbed, title: this.drawEndTitle, description: this.drawEndDescription.replace(/{player1}/g, message.author.username).replace(/{player1move}/g, userChoice).replace(/{player2}/g, bot.user.username || "Bot").replace(/{player2move}/g, choice) }], components: [row] });
             } else if ((userChoice === "✊" && choice === "✌️") || (userChoice === "🤚" && choice === "✊") || (userChoice === "✌️" && choice === "🤚")) { // user win
-                sent.edit({ embeds: [{ color: "GREEN", title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, bot.user.username), description: this.endDescription.replace(/{winner}/g, message.author.username).replace(/{winnermove}/g, userChoice).replace(/{looser}/g, bot.user.username || "Bot").replace(/{loosermove}/g, choice) }], components: [row] });
+                sent.edit({ embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, bot.user.username), description: this.endDescription.replace(/{winner}/g, message.author.username).replace(/{winnermove}/g, userChoice).replace(/{looser}/g, bot.user.username || "Bot").replace(/{loosermove}/g, choice) }], components: [row] });
             } else { // User loose
-                sent.edit({ embeds: [{ color: "GREEN", title: this.endTitle.replace(/{looser}/g, message.author.username).replace(/{winner}/g, bot.user.username), description: this.endDescription.replace(/{looser}/g, message.author.username).replace(/{loosermove}/g, userChoice).replace(/{winner}/g, bot.user.username || "Bot").replace(/{winnermove}/g, choice) }], components: [row] });
+                sent.edit({ embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{looser}/g, message.author.username).replace(/{winner}/g, bot.user.username), description: this.endDescription.replace(/{looser}/g, message.author.username).replace(/{loosermove}/g, userChoice).replace(/{winner}/g, bot.user.username || "Bot").replace(/{winnermove}/g, choice) }], components: [row] });
             }
         }).catch(e => {
             if (e.username) {
@@ -67,28 +74,55 @@ class rps {
         if (!player2 || !player2.username) throw new Error("Invalid Player 2 Object");
 
         const player1 = message.author;
-        const sent = await message.channel.send({ embeds: [{ color: "ORANGE", title: this.readyMessage }] });
-        let no = false;
+        const sent = await message.channel.send({ embeds: [{ color: this.colors.readyEmbed, title: this.readyMessage }] });
+        let no = false, player1Choice = "", player2Choice = "";
 
-        let player1Choice = "";
-        await message.channel.send({ content: `${player1.toString()}`, reply: { messageReference: sent.id } });
-        await getChoice.bind(this)(player1, await player1.createDM()).then(v => player1Choice = v.choice).catch(e => no = e.username)
-        let player2Choice = "";
-        await message.channel.send({ content: `${player2.toString()}`, reply: { messageReference: sent.id } });
-        await getChoice.bind(this)(player2, await player2.createDM()).then(v => player2Choice = v.choice).catch(e => no = e.username);
+        if (this.chooseIn === "dm") {
+            await message.channel.send({ content: `${player1.toString()}`, reply: { messageReference: sent.id } });
+            await getChoice.bind(this)(player1, await player1.createDM()).then(v => player1Choice = v.choice).catch(e => no = e.username)
+            await message.channel.send({ content: `${player2.toString()}`, reply: { messageReference: sent.id } });
+            await getChoice.bind(this)(player2, await player2.createDM()).then(v => player2Choice = v.choice).catch(e => no = e.username);
 
-        if (no !== false) return sent.edit({ components: [], embeds: [{ color: "RED", title: `I was unaable to DM ${no}, so please open DM than try again.` }] })
+            if (no !== false) return sent.edit({ components: [], embeds: [{ color: this.colors.errorEmbed, title: `I was unable to DM ${no}, so please open DM than try again.` }] })
 
-        let row = new Discord.MessageActionRow().addComponents(new Discord.MessageButton().setCustomId("y7ghjuiojioujoj").setDisabled(true).setStyle("SUCCESS").setEmoji("🕊").setLabel("Game Ended"))
+            let row = new Discord.MessageActionRow().addComponents(new Discord.MessageButton().setCustomId("y7ghjuiojioujoj").setDisabled(true).setStyle("SUCCESS").setEmoji("🕊").setLabel("Game Ended"))
 
-        if (player1Choice === player2Choice) { // draw
-            sent.edit({ embeds: [{ color: "DARK_BUT_NOT_BLACK", title: this.drawEndTitle, description: this.drawEndDescription.replace(/{player1}/g, message.author.username).replace(/{player1move}/g, player1Choice).replace(/{player2}/g, player2.username).replace(/{player2move}/g, player2Choice) }], components: [row] });
-        } else if ((player1Choice === "✊" && player2Choice === "✌️") || (player1Choice === "🤚" && player2Choice === "✊") || (player1Choice === "✌️" && player2Choice === "🤚")) { // player 1 won
-            sent.edit({ embeds: [{ color: "GREEN", title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, player2.username), description: this.endDescription.replace(/{winner}/g, message.author.username).replace(/{winnermove}/g, player1Choice).replace(/{looser}/g, player2.username || "Bot").replace(/{loosermove}/g, player2Choice) }], components: [row] });
-        } else { // player 2 won
-            sent.edit({ embeds: [{ color: "GREEN", title: this.endTitle.replace(/{looser}/g, message.author.username).replace(/{winner}/g, player2.username), description: this.endDescription.replace(/{looser}/g, message.author.username).replace(/{loosermove}/g, player1Choice).replace(/{winner}/g, player2.username || "Bot").replace(/{winnermove}/g, player2Choice) }], components: [row] });
+            if (player1Choice === player2Choice) { // draw
+                sent.edit({ embeds: [{ color: this.colors.drawEmbed, title: this.drawEndTitle, description: this.drawEndDescription.replace(/{player1}/g, message.author.username).replace(/{player1move}/g, player1Choice).replace(/{player2}/g, player2.username).replace(/{player2move}/g, player2Choice) }], components: [row] });
+            } else if ((player1Choice === "✊" && player2Choice === "✌️") || (player1Choice === "🤚" && player2Choice === "✊") || (player1Choice === "✌️" && player2Choice === "🤚")) { // player 1 won
+                sent.edit({ embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, player2.username), description: this.endDescription.replace(/{winner}/g, message.author.username).replace(/{winnermove}/g, player1Choice).replace(/{looser}/g, player2.username || "Bot").replace(/{loosermove}/g, player2Choice) }], components: [row] });
+            } else { // player 2 won
+                sent.edit({ embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{looser}/g, message.author.username).replace(/{winner}/g, player2.username), description: this.endDescription.replace(/{looser}/g, message.author.username).replace(/{loosermove}/g, player1Choice).replace(/{winner}/g, player2.username || "Bot").replace(/{winnermove}/g, player2Choice) }], components: [row] });
+            }
+        } else {
+            await getChoices.bind(this)(player1, player2, message).then(v => {
+                player1Choice = v.p1choice;
+                player2Choice = v.p2choice;
+
+                if (no !== false) return sent.edit({ components: [], embeds: [{ color: this.colors.errorEmbed, title: `I was unable to DM ${no}, so please open DM than try again.` }] })
+
+                let row = new Discord.MessageActionRow().addComponents(new Discord.MessageButton().setCustomId("y7ghjuiojioujoj").setDisabled(true).setStyle("SUCCESS").setEmoji("🕊").setLabel("Game Ended"))
+
+                if (player1Choice === player2Choice) { // draw
+                    sent.edit({ embeds: [{ color: this.colors.drawEmbed, title: this.drawEndTitle, description: this.drawEndDescription.replace(/{player1}/g, message.author.username).replace(/{player1move}/g, player1Choice).replace(/{player2}/g, player2.username).replace(/{player2move}/g, player2Choice) }], components: [row] });
+                } else if ((player1Choice === "✊" && player2Choice === "✌️") || (player1Choice === "🤚" && player2Choice === "✊") || (player1Choice === "✌️" && player2Choice === "🤚")) { // player 1 won
+                    sent.edit({ embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, player2.username), description: this.endDescription.replace(/{winner}/g, message.author.username).replace(/{winnermove}/g, player1Choice).replace(/{looser}/g, player2.username || "Bot").replace(/{loosermove}/g, player2Choice) }], components: [row] });
+                } else { // player 2 won
+                    sent.edit({ embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{looser}/g, message.author.username).replace(/{winner}/g, player2.username), description: this.endDescription.replace(/{looser}/g, message.author.username).replace(/{loosermove}/g, player1Choice).replace(/{winner}/g, player2.username || "Bot").replace(/{winnermove}/g, player2Choice) }], components: [row] });
+                }
+            }).catch(e => {
+                no === true;
+            });
         }
     }
 }
 
 module.exports = rps;
+
+/**
+ * @typedef {Object} Colors The colors to use in embeds.
+ * @property {String} readyEmbed The color for ready embed.
+ * @property {String} errorEmbed The color for error embed.
+ * @property {String} drawEmbed The color for draw embed.
+ * @property {String} endEmbed The color for draw embed.
+ */
