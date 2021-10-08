@@ -38,6 +38,7 @@ class rps {
      * @param {Discord.Client} bot The client object
      */
     async solo(message, bot) {
+        message.author = message.author || message.user;
         getChoice.bind(this)(message.author, message.channel).then(v => {
 
             const userChoice = v.choice;
@@ -55,9 +56,12 @@ class rps {
             }
         }).catch(e => {
             if (e.username) {
-                message.reply(`I was unable to DM ${e.username}`);
+                if(!message.replied)message.reply(`I was unable to DM ${e.username}`);
+                else message.followUp(`I was unable to DM ${e.username}`);
             } else {
-                message.reply("There was a error in executing the command");
+                if(!message.replied)message.reply("There was a error in executing the command");
+                else message.followUp("There was a error in executing the command");
+                
                 console.log(`[discord-rock-paper-scissor] : Error in Solo mode : `);
                 console.log(e);
             }
@@ -70,6 +74,7 @@ class rps {
      * @param {Discord.User} player2 The Second Player's Discord User Object
      */
     async duo(message, player2) {
+        message.author = message.author || message.user;
         if (!message || !message.author) throw new Error("Invalid Message Object");
         if (!player2 || !player2.username) throw new Error("Invalid Player 2 Object");
 
