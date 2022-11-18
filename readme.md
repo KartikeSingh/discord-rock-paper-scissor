@@ -67,12 +67,25 @@ rps.solo(message,bot);
 rps.duo(message,player2);
 ```
 
+## Game Response
+```js
+const result = await rps.solo(); // or await rps.duo();
+
+/** Result body example
+ * {
+ * failed: boolean, // false => game ended successfully, true => game failed
+ * winner: number, // -1 => no one won, 0 => user 1 won or bot incase of solo, 1 => user 2 won or player incase of solo, null => game failed
+ * reason: "", // reason of game end
+ * error?: Error, // the error object, sometimes it is attached
+ */
+```
+
 # Example Images
 ## The Game
 ![game.png](https://cdn.discordapp.com/attachments/880732844220100608/880744256258588733/unknown.png)
 
 ## Game ending
-![gameend.png](https://cdn.discordapp.com/attachments/880732844220100608/880744307454259240/unknown.png)
+![gameend.png](https://media.discordapp.net/attachments/872410018874535957/1043088441723863081/image.png)
 
 ## Game Private for DUO Mode
 In duo mode both users have to choose in DM
