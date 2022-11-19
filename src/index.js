@@ -119,8 +119,9 @@ class rps {
                         const data = {
                             embeds: [{
                                 color: this.colors.endEmbed,
-                                title: this.endTitle.replace(/{looser}/g,
-                                    message.author.username).replace(/{winner}/g, bot.user.username),
+                                title: this.endTitle
+                                    .replace(/{looser}/g, message.author.username)
+                                    .replace(/{winner}/g, bot.user.username),
                                 description: this.endDescription
                                     .replace(/{looser}/g, message.author.username)
                                     .replace(/{loosermove}/g, userChoice)
@@ -143,8 +144,10 @@ class rps {
             }).catch(e => {
                 if (e.username) {
                     if (this.endReply) {
+
                         if (!message.replied && !message.deferred) message.reply(`I was unable to DM ${e.username}`);
                         else message.followUp(`I was unable to DM ${e.username}`);
+
                     }
                     res({
                         failed: true,
@@ -230,7 +233,8 @@ class rps {
                 let row = new Discord.MessageActionRow()
                     .addComponents(new Discord.MessageButton()
                         .setCustomId("y7ghjuiojioujoj")
-                        .setDisabled(true).setStyle("SUCCESS")
+                        .setDisabled(true)
+                        .setStyle("SUCCESS")
                         .setEmoji("🕊")
                         .setLabel("Game Ended"))
 
