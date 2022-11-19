@@ -144,10 +144,8 @@ class rps {
             }).catch(e => {
                 if (e.username) {
                     if (this.endReply) {
-
                         if (!message.replied && !message.deferred) message.reply(`I was unable to DM ${e.username}`);
                         else message.followUp(`I was unable to DM ${e.username}`);
-
                     }
                     res({
                         failed: true,
