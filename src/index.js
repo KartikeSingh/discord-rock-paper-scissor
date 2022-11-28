@@ -42,6 +42,12 @@ class rps {
      * @param {Discord.Client} bot The client object
      */
     async solo(message, bot) {
+        const winConditions = {
+            '✊': '✌️',
+            '🤚': '✊',
+            '✌️': '🤚'
+        }
+
         return new Promise(async res => {
             message.author = message.author || message.user;
 
@@ -50,11 +56,29 @@ class rps {
                 const sent = v.message;
                 const choice = getEmoji(Math.floor(Math.random() * 3) + 1);
 
-                let row = new Discord.MessageActionRow().addComponents(new Discord.MessageButton().setCustomId("y7ghjuiojioujoj").setDisabled(true).setStyle("SUCCESS").setEmoji("🕊").setLabel("Game Ended"));
+                let row = new Discord.MessageActionRow()
+                    .addComponents(new Discord.MessageButton()
+                        .setCustomId("y7ghjuiojioujoj")
+                        .setDisabled(true)
+                        .setStyle("SUCCESS")
+                        .setEmoji("🕊")
+                        .setLabel("Game Ended")
+                    );
 
                 if (userChoice === choice) { // draw
                     if (this.endReply) {
-                        const data = { embeds: [{ color: this.colors.drawEmbed, title: this.drawEndTitle, description: this.drawEndDescription.replace(/{player1}/g, message.author.username).replace(/{player1move}/g, userChoice).replace(/{player2}/g, bot.user.username || "Bot").replace(/{player2move}/g, choice) }], components: [row] };
+                        const data = {
+                            embeds: [{
+                                color: this.colors.drawEmbed,
+                                title: this.drawEndTitle,
+                                description: this.drawEndDescription
+                                    .replace(/{player1}/g, message.author.username)
+                                    .replace(/{player1move}/g, userChoice)
+                                    .replace(/{player2}/g, bot.user.username || "Bot")
+                                    .replace(/{player2move}/g, choice)
+                            }],
+                            components: [row]
+                        };
 
                         if (message.ephemeral) message.editReply(data);
                         else sent.edit(data);
@@ -65,9 +89,21 @@ class rps {
                         winner: -1,
                         reason: "draw"
                     });
-                } else if ((userChoice === "✊" && choice === "✌️") || (userChoice === "🤚" && choice === "✊") || (userChoice === "✌️" && choice === "🤚")) { // user win
+                } else if (winConditions[choice] !== userChoice) { // user win
                     if (this.endReply) {
-                        const data = { embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, bot.user.username), description: this.endDescription.replace(/{winner}/g, message.author.username).replace(/{winnermove}/g, userChoice).replace(/{looser}/g, bot.user.username || "Bot").replace(/{loosermove}/g, choice) }], components: [row] };
+                        const data = {
+                            embeds: [{
+                                color: this.colors.endEmbed,
+                                title: this.endTitle
+                                    .replace(/{winner}/g, message.author.username)
+                                    .replace(/{looser}/g, bot.user.username),
+                                description: this.endDescription
+                                    .replace(/{winner}/g, message.author.username)
+                                    .replace(/{winnermove}/g, userChoice).replace(/{looser}/g, bot.user.username || "Bot")
+                                    .replace(/{loosermove}/g, choice)
+                            }],
+                            components: [row]
+                        };
 
                         if (message.ephemeral) message.editReply(data);
                         else sent.edit(data);
@@ -80,7 +116,20 @@ class rps {
                     });
                 } else { // User loose
                     if (this.endReply) {
-                        const data = { embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{looser}/g, message.author.username).replace(/{winner}/g, bot.user.username), description: this.endDescription.replace(/{looser}/g, message.author.username).replace(/{loosermove}/g, userChoice).replace(/{winner}/g, bot.user.username || "Bot").replace(/{winnermove}/g, choice) }], components: [row] };
+                        const data = {
+                            embeds: [{
+                                color: this.colors.endEmbed,
+                                title: this.endTitle
+                                    .replace(/{looser}/g, message.author.username)
+                                    .replace(/{winner}/g, bot.user.username),
+                                description: this.endDescription
+                                    .replace(/{looser}/g, message.author.username)
+                                    .replace(/{loosermove}/g, userChoice)
+                                    .replace(/{winner}/g, bot.user.username || "Bot")
+                                    .replace(/{winnermove}/g, choice)
+                            }],
+                            components: [row]
+                        };
 
                         if (message.ephemeral) message.editReply(data);
                         else sent.edit(data);
@@ -141,20 +190,31 @@ class rps {
             });
 
             const player1 = message.author;
-            const sent = await message.channel.send({ embeds: [{ color: this.colors.readyEmbed, title: this.readyMessage }] });
+            const sent = await message.channel.send({
+                embeds: [{
+                    color: this.colors.readyEmbed,
+                    title: this.readyMessage
+                }]
+            });
 
             let no = false, player1Choice = "", player2Choice = "";
 
             if (this.chooseIn === "dm") {
                 await message.channel.send({ content: `${player1.toString()}`, reply: { messageReference: sent.id } });
-                await getChoice.bind(this)(player1, await player1.createDM()).then(v => player1Choice = v.choice).catch(e => no = e.username)
+                await getChoice.bind(this)(player1, await player1.createDM())
+                    .then(v => player1Choice = v.choice).catch(e => no = e.username)
                 await message.channel.send({ content: `${player2.toString()}`, reply: { messageReference: sent.id } });
-                await getChoice.bind(this)(player2, await player2.createDM()).then(v => player2Choice = v.choice).catch(e => no = e.username);
+                await getChoice.bind(this)(player2, await player2.createDM())
+                    .then(v => player2Choice = v.choice).catch(e => no = e.username);
 
                 if (no !== false) {
                     if (this.endReply) {
                         const data = {
-                            components: [], embeds: [{ color: this.colors.errorEmbed, title: `I was unable to DM ${no}, so please open DM than try again.` }]
+                            components: [],
+                            embeds: [{
+                                color: this.colors.errorEmbed,
+                                title: `I was unable to DM ${no}, so please open DM than try again.`
+                            }]
                         };
 
                         if (message.ephemeral) message.editReply(data);
@@ -168,11 +228,28 @@ class rps {
                     });
                 }
 
-                let row = new Discord.MessageActionRow().addComponents(new Discord.MessageButton().setCustomId("y7ghjuiojioujoj").setDisabled(true).setStyle("SUCCESS").setEmoji("🕊").setLabel("Game Ended"))
+                let row = new Discord.MessageActionRow()
+                    .addComponents(new Discord.MessageButton()
+                        .setCustomId("y7ghjuiojioujoj")
+                        .setDisabled(true)
+                        .setStyle("SUCCESS")
+                        .setEmoji("🕊")
+                        .setLabel("Game Ended"))
 
                 if (player1Choice === player2Choice) { // draw
                     if (this.endReply) {
-                        const data = { embeds: [{ color: this.colors.drawEmbed, title: this.drawEndTitle, description: this.drawEndDescription.replace(/{player1}/g, message.author.username).replace(/{player1move}/g, player1Choice).replace(/{player2}/g, player2.username).replace(/{player2move}/g, player2Choice) }], components: [row] };
+                        const data = {
+                            embeds: [{
+                                color: this.colors.drawEmbed,
+                                title: this.drawEndTitle,
+                                description: this.drawEndDescription
+                                    .replace(/{player1}/g, message.author.username)
+                                    .replace(/{player1move}/g, player1Choice)
+                                    .replace(/{player2}/g, player2.username)
+                                    .replace(/{player2move}/g, player2Choice)
+                            }],
+                            components: [row]
+                        };
 
                         if (message.ephemeral) message.editReply(data);
                         else sent.edit(data);
@@ -183,9 +260,22 @@ class rps {
                         winner: -1,
                         reason: "draw"
                     });
-                } else if ((player1Choice === "✊" && player2Choice === "✌️") || (player1Choice === "🤚" && player2Choice === "✊") || (player1Choice === "✌️" && player2Choice === "🤚")) { // player 1 won
+                } else if (winConditions[player2Choice] !== player1Choice) { // player 1 won
                     if (this.endReply) {
-                        const data = { embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, player2.username), description: this.endDescription.replace(/{winner}/g, message.author.username).replace(/{winnermove}/g, player1Choice).replace(/{looser}/g, player2.username || "Bot").replace(/{loosermove}/g, player2Choice) }], components: [row] };
+                        const data = {
+                            embeds: [{
+                                color: this.colors.endEmbed,
+                                title: this.endTitle
+                                    .replace(/{winner}/g, message.author.username)
+                                    .replace(/{looser}/g, player2.username),
+                                description: this.endDescription
+                                    .replace(/{winner}/g, message.author.username)
+                                    .replace(/{winnermove}/g, player1Choice)
+                                    .replace(/{looser}/g, player2.username || "Bot")
+                                    .replace(/{loosermove}/g, player2Choice)
+                            }],
+                            components: [row]
+                        };
 
                         if (message.ephemeral) message.editReply(data);
                         else sent.edit(data);
@@ -198,7 +288,20 @@ class rps {
                     });
                 } else { // player 2 won
                     if (this.endReply) {
-                        const data = { embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{looser}/g, message.author.username).replace(/{winner}/g, player2.username), description: this.endDescription.replace(/{looser}/g, message.author.username).replace(/{loosermove}/g, player1Choice).replace(/{winner}/g, player2.username || "Bot").replace(/{winnermove}/g, player2Choice) }], components: [row] };
+                        const data = {
+                            embeds: [{
+                                color: this.colors.endEmbed,
+                                title: this.endTitle
+                                    .replace(/{looser}/g, message.author.username)
+                                    .replace(/{winner}/g, player2.username),
+                                description: this.endDescription
+                                    .replace(/{looser}/g, message.author.username)
+                                    .replace(/{loosermove}/g, player1Choice)
+                                    .replace(/{winner}/g, player2.username || "Bot")
+                                    .replace(/{winnermove}/g, player2Choice)
+                            }],
+                            components: [row]
+                        };
 
                         if (message.ephemeral) message.editReply(data);
                         else sent.edit(data);
@@ -219,7 +322,18 @@ class rps {
 
                     if (player1Choice === player2Choice) { // draw
                         if (this.endReply) {
-                            const data = { embeds: [{ color: this.colors.drawEmbed, title: this.drawEndTitle, description: this.drawEndDescription.replace(/{player1}/g, message.author.username).replace(/{player1move}/g, player1Choice).replace(/{player2}/g, player2.username).replace(/{player2move}/g, player2Choice) }], components: [row] };
+                            const data = {
+                                embeds: [{
+                                    color: this.colors.drawEmbed,
+                                    title: this.drawEndTitle,
+                                    description: this.drawEndDescription
+                                        .replace(/{player1}/g, message.author.username)
+                                        .replace(/{player1move}/g, player1Choice)
+                                        .replace(/{player2}/g, player2.username)
+                                        .replace(/{player2move}/g, player2Choice)
+                                }],
+                                components: [row]
+                            };
 
                             if (message.ephemeral) message.editReply(data);
                             else sent.edit(data);
@@ -230,9 +344,19 @@ class rps {
                             winner: -1,
                             reason: "draw"
                         });
-                    } else if ((player1Choice === "✊" && player2Choice === "✌️") || (player1Choice === "🤚" && player2Choice === "✊") || (player1Choice === "✌️" && player2Choice === "🤚")) { // player 1 won
+                    } else if (winConditions[player2Choice] !== player1Choice) { // player 1 won
                         if (this.endReply) {
-                            const data = { embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, player2.username), description: this.endDescription.replace(/{winner}/g, message.author.username).replace(/{winnermove}/g, player1Choice).replace(/{looser}/g, player2.username || "Bot").replace(/{loosermove}/g, player2Choice) }], components: [row] };
+                            const data = {
+                                embeds: [{
+                                    color: this.colors.endEmbed,
+                                    title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, player2.username),
+                                    description: this.endDescription
+                                        .replace(/{winner}/g, message.author.username)
+                                        .replace(/{winnermove}/g, player1Choice)
+                                        .replace(/{looser}/g, player2.username || "Bot")
+                                        .replace(/{loosermove}/g, player2Choice)
+                                }], components: [row]
+                            };
 
                             if (message.ephemeral) message.editReply(data);
                             else sent.edit(data);
@@ -245,7 +369,20 @@ class rps {
                         });
                     } else { // player 2 won
                         if (this.endReply) {
-                            const data = { embeds: [{ color: this.colors.endEmbed, title: this.endTitle.replace(/{looser}/g, message.author.username).replace(/{winner}/g, player2.username), description: this.endDescription.replace(/{looser}/g, message.author.username).replace(/{loosermove}/g, player1Choice).replace(/{winner}/g, player2.username || "Bot").replace(/{winnermove}/g, player2Choice) }], components: [row] };
+                            const data = {
+                                embeds: [{
+                                    color: this.colors.endEmbed,
+                                    title: this.endTitle
+                                        .replace(/{looser}/g, message.author.username)
+                                        .replace(/{winner}/g, player2.username),
+                                    description: this.endDescription
+                                        .replace(/{looser}/g, message.author.username)
+                                        .replace(/{loosermove}/g, player1Choice)
+                                        .replace(/{winner}/g, player2.username || "Bot")
+                                        .replace(/{winnermove}/g, player2Choice)
+                                }],
+                                components: [row]
+                            };
 
                             if (message.ephemeral) message.editReply(data);
                             else sent.edit(data);
@@ -259,9 +396,15 @@ class rps {
                     }
                 }).catch(e => {
                     if (this.endReply) {
-                        sent.edit({ components: [], embeds: [{ color: this.colors.errorEmbed, title: `I was unable to DM ${no}, so please open DM than try again.` }] })
+                        sent.edit({
+                            components: [],
+                            embeds: [{
+                                color: this.colors.errorEmbed,
+                                title: `I was unable to DM ${no}, so please open DM than try again.`
+                            }]
+                        })
                     }
-                    
+
                     return res({
                         failed: true,
                         victory: null,
