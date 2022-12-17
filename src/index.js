@@ -45,7 +45,7 @@ class rps {
         return new Promise(async res => {
             message.author = message.author || message.user;
 
-            getChoice.bind(this)(message).then(v => {
+            getChoice.bind(this)(message.author, await message.author.createDM()).then(v => {
                 const userChoice = v.choice;
                 const sent = v.message;
                 const choice = getEmoji(Math.floor(Math.random() * 3) + 1);
