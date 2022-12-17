@@ -1,6 +1,6 @@
 {
   "name": "discord-rock-paper-scissor",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "An module to create Rock Paper Scissor game for discord bots",
   "main": "src/index",
   "scripts": {
