@@ -8,8 +8,16 @@ const Discord = require('discord.js'), getEmoji = require('./getEmoji');
 function getChoice(user, channel) {
     return new Promise(async (res, rej) => {
         try {
-            const row = new Discord.MessageActionRow().addComponents([new Discord.MessageButton().setCustomId("1_rock_paper_scissor").setStyle("PRIMARY").setEmoji("✊").setLabel("Rock"), new Discord.MessageButton().setCustomId("2_rock_paper_scissor").setStyle("PRIMARY").setEmoji("🖐").setLabel("Paper"), new Discord.MessageButton().setCustomId("3_rock_paper_scissor").setStyle("PRIMARY").setEmoji("✌").setLabel("Scissor")]),
-                data = { components: [row], embeds: [{ color: this.colors.choiceEmbed, title: this.choiceTitle, description: this.choiceDescription }] };
+            const row = new Discord.ActionRowBuilder().addComponents([new Discord.ButtonBuilder().setCustomId("1_rock_paper_scissor").setStyle(Discord.ButtonStyle.Primary).setEmoji("✊").setLabel("Rock"), new Discord.ButtonBuilder().setCustomId("2_rock_paper_scissor").setStyle(Discord.ButtonStyle.Primary).setEmoji("🖐").setLabel("Paper"), new Discord.ButtonBuilder().setCustomId("3_rock_paper_scissor").setStyle(Discord.ButtonStyle.Primary).setEmoji("✌").setLabel("Scissor")]),
+                data = {
+                    components: [row],
+                    embeds: [
+                        new Discord.EmbedBuilder({
+                            title: this.choiceTitle,
+                            description: this.choiceDescription
+                        }).setColor(this.colors.choiceEmbed)
+                    ]
+                };
 
             let sent;
 

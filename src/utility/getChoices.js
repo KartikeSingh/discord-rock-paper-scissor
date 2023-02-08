@@ -8,9 +8,17 @@ const Discord = require('discord.js'), getEmoji = require('./getEmoji');
 function getChoice(player1, player2, message) {
     return new Promise(async (res, rej) => {
         try {
-            const row1 = new Discord.MessageActionRow().addComponents([new Discord.MessageButton().setCustomId("1_rock_paper_scissor_a").setStyle("PRIMARY").setEmoji("✊").setLabel("Rock"), new Discord.MessageButton().setCustomId("2_rock_paper_scissor_a").setStyle("PRIMARY").setEmoji("🖐").setLabel("Paper"), new Discord.MessageButton().setCustomId("3_rock_paper_scissor_a").setStyle("PRIMARY").setEmoji("✌").setLabel("Scissor")]);
-            const row2 = new Discord.MessageActionRow().addComponents([new Discord.MessageButton().setCustomId("1_rock_paper_scissor_b").setStyle("PRIMARY").setEmoji("✊").setLabel("Rock"), new Discord.MessageButton().setCustomId("2_rock_paper_scissor_b").setStyle("PRIMARY").setEmoji("🖐").setLabel("Paper"), new Discord.MessageButton().setCustomId("3_rock_paper_scissor_b").setStyle("PRIMARY").setEmoji("✌").setLabel("Scissor")]);
-            const data = { components: [row1, row2], embeds: [{ color: this.colors.choiceEmbed, title: this.choiceTitle, description: this.choiceDescription }] };
+            const row1 = new Discord.ActionRowBuilder().addComponents([new Discord.ButtonBuilder().setCustomId("1_rock_paper_scissor_a").setStyle(Discord.ButtonStyle.Primary).setEmoji("✊").setLabel("Rock"), new Discord.ButtonBuilder().setCustomId("2_rock_paper_scissor_a").setStyle(Discord.ButtonStyle.Primary).setEmoji("🖐").setLabel("Paper"), new Discord.ButtonBuilder().setCustomId("3_rock_paper_scissor_a").setStyle(Discord.ButtonStyle.Primary).setEmoji("✌").setLabel("Scissor")]);
+            const row2 = new Discord.ActionRowBuilder().addComponents([new Discord.ButtonBuilder().setCustomId("1_rock_paper_scissor_b").setStyle(Discord.ButtonStyle.Primary).setEmoji("✊").setLabel("Rock"), new Discord.ButtonBuilder().setCustomId("2_rock_paper_scissor_b").setStyle(Discord.ButtonStyle.Primary).setEmoji("🖐").setLabel("Paper"), new Discord.ButtonBuilder().setCustomId("3_rock_paper_scissor_b").setStyle(Discord.ButtonStyle.Primary).setEmoji("✌").setLabel("Scissor")]);
+            const data = {
+                components: [row1, row2],
+                embeds: [
+                    new Discord.EmbedBuilder({
+                        title: this.choiceTitle,
+                        description: this.choiceDescription
+                    }).setColor(this.colors.choiceEmbed)
+                ]
+            };
 
             let sent;
 
@@ -41,10 +49,9 @@ function getChoice(player1, player2, message) {
                     await sent.edit({ components: [row1, row2] });
                 } else {
                     interaction.reply({
-                        embeds: [{
-                            color: "RED",
+                        embeds: [new Discord.EmbedBuilder({
                             title: "❌ Invalid Button Used"
-                        }]
+                        }).setColor("Red")]
                     })
                 }
 

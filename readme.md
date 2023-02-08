@@ -80,16 +80,9 @@ const result = await rps.solo(); // or await rps.duo();
  */
 ```
 
-# Example Images
-## The Game
-![game.png](https://cdn.discordapp.com/attachments/880732844220100608/880744256258588733/unknown.png)
-
-## Game ending
-![gameend.png](https://media.discordapp.net/attachments/872410018874535957/1043088441723863081/image.png)
-
-## Game Private for DUO Mode
-In duo mode both users have to choose in DM
-![gamerequest.png](https://cdn.discordapp.com/attachments/880732844220100608/880744362424803328/unknown.png)
+# Note
+- For discord JS 13, use version `1.2.1`
+- For discord JS 14, use version `>=1.2.2`
 
 # Support
 If you need any help or something you can get support on my [discord server](https://discord.gg/XYnMTQNTFh)

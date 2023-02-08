@@ -56,11 +56,11 @@ class rps {
                 const sent = v.message;
                 const choice = getEmoji(Math.floor(Math.random() * 3) + 1);
 
-                let row = new Discord.MessageActionRow()
-                    .addComponents(new Discord.MessageButton()
+                let row = new Discord.ActionRowBuilder()
+                    .addComponents(new Discord.ButtonBuilder()
                         .setCustomId("y7ghjuiojioujoj")
                         .setDisabled(true)
-                        .setStyle("SUCCESS")
+                        .setStyle(Discord.ButtonStyle.Success)
                         .setEmoji("🕊")
                         .setLabel("Game Ended")
                     );
@@ -68,15 +68,14 @@ class rps {
                 if (userChoice === choice) { // draw
                     if (this.endReply) {
                         const data = {
-                            embeds: [{
-                                color: this.colors.drawEmbed,
+                            embeds: [new Discord.EmbedBuilder({
                                 title: this.drawEndTitle,
                                 description: this.drawEndDescription
                                     .replace(/{player1}/g, message.author.username)
                                     .replace(/{player1move}/g, userChoice)
                                     .replace(/{player2}/g, bot.user.username || "Bot")
                                     .replace(/{player2move}/g, choice)
-                            }],
+                            }).setColor(this.colors.drawEmbed)],
                             components: [row]
                         };
 
@@ -92,8 +91,7 @@ class rps {
                 } else if (winConditions[choice] !== userChoice) { // user win
                     if (this.endReply) {
                         const data = {
-                            embeds: [{
-                                color: this.colors.endEmbed,
+                            embeds: [new Discord.EmbedBuilder({
                                 title: this.endTitle
                                     .replace(/{winner}/g, message.author.username)
                                     .replace(/{looser}/g, bot.user.username),
@@ -101,7 +99,7 @@ class rps {
                                     .replace(/{winner}/g, message.author.username)
                                     .replace(/{winnermove}/g, userChoice).replace(/{looser}/g, bot.user.username || "Bot")
                                     .replace(/{loosermove}/g, choice)
-                            }],
+                            }).setColor(this.colors.endEmbed)],
                             components: [row]
                         };
 
@@ -117,8 +115,7 @@ class rps {
                 } else { // User loose
                     if (this.endReply) {
                         const data = {
-                            embeds: [{
-                                color: this.colors.endEmbed,
+                            embeds: [new Discord.EmbedBuilder({
                                 title: this.endTitle
                                     .replace(/{looser}/g, message.author.username)
                                     .replace(/{winner}/g, bot.user.username),
@@ -127,7 +124,7 @@ class rps {
                                     .replace(/{loosermove}/g, userChoice)
                                     .replace(/{winner}/g, bot.user.username || "Bot")
                                     .replace(/{winnermove}/g, choice)
-                            }],
+                            }).setColor(this.colors.endEmbed)],
                             components: [row]
                         };
 
@@ -191,10 +188,9 @@ class rps {
 
             const player1 = message.author;
             const sent = await message.channel.send({
-                embeds: [{
-                    color: this.colors.readyEmbed,
+                embeds: [new Discord.EmbedBuilder({
                     title: this.readyMessage
-                }]
+                }).setColor(this.colors.readyEmbed)]
             });
 
             let no = false, player1Choice = "", player2Choice = "";
@@ -211,10 +207,9 @@ class rps {
                     if (this.endReply) {
                         const data = {
                             components: [],
-                            embeds: [{
-                                color: this.colors.errorEmbed,
+                            embeds: [new Discord.EmbedBuilder({
                                 title: `I was unable to DM ${no}, so please open DM than try again.`
-                            }]
+                            }).setColor(this.colors.errorEmbed)]
                         };
 
                         if (message.ephemeral) message.editReply(data);
@@ -228,26 +223,25 @@ class rps {
                     });
                 }
 
-                let row = new Discord.MessageActionRow()
-                    .addComponents(new Discord.MessageButton()
+                let row = new Discord.ActionRowBuilder()
+                    .addComponents(new Discord.ButtonBuilder()
                         .setCustomId("y7ghjuiojioujoj")
                         .setDisabled(true)
-                        .setStyle("SUCCESS")
+                        .setStyle(Discord.ButtonStyle.Success)
                         .setEmoji("🕊")
                         .setLabel("Game Ended"))
 
                 if (player1Choice === player2Choice) { // draw
                     if (this.endReply) {
                         const data = {
-                            embeds: [{
-                                color: this.colors.drawEmbed,
+                            embeds: [new Discord.EmbedBuilder({
                                 title: this.drawEndTitle,
                                 description: this.drawEndDescription
                                     .replace(/{player1}/g, message.author.username)
                                     .replace(/{player1move}/g, player1Choice)
                                     .replace(/{player2}/g, player2.username)
                                     .replace(/{player2move}/g, player2Choice)
-                            }],
+                            }).setColor(this.colors.drawEmbed)],
                             components: [row]
                         };
 
@@ -263,8 +257,7 @@ class rps {
                 } else if (winConditions[player2Choice] !== player1Choice) { // player 1 won
                     if (this.endReply) {
                         const data = {
-                            embeds: [{
-                                color: this.colors.endEmbed,
+                            embeds: [new Discord.EmbedBuilder({
                                 title: this.endTitle
                                     .replace(/{winner}/g, message.author.username)
                                     .replace(/{looser}/g, player2.username),
@@ -273,7 +266,7 @@ class rps {
                                     .replace(/{winnermove}/g, player1Choice)
                                     .replace(/{looser}/g, player2.username || "Bot")
                                     .replace(/{loosermove}/g, player2Choice)
-                            }],
+                            }).setColor(this.colors.e)],
                             components: [row]
                         };
 
@@ -289,8 +282,7 @@ class rps {
                 } else { // player 2 won
                     if (this.endReply) {
                         const data = {
-                            embeds: [{
-                                color: this.colors.endEmbed,
+                            embeds: [new Discord.EmbedBuilder({
                                 title: this.endTitle
                                     .replace(/{looser}/g, message.author.username)
                                     .replace(/{winner}/g, player2.username),
@@ -299,7 +291,7 @@ class rps {
                                     .replace(/{loosermove}/g, player1Choice)
                                     .replace(/{winner}/g, player2.username || "Bot")
                                     .replace(/{winnermove}/g, player2Choice)
-                            }],
+                            }).setColor(this.colors.e)],
                             components: [row]
                         };
 
@@ -318,20 +310,19 @@ class rps {
                     player1Choice = v.p1choice;
                     player2Choice = v.p2choice;
 
-                    let row = new Discord.MessageActionRow().addComponents(new Discord.MessageButton().setCustomId("y7ghjuiojioujoj").setDisabled(true).setStyle("SUCCESS").setEmoji("🕊").setLabel("Game Ended"))
+                    let row = new Discord.ActionRowBuilder().addComponents(new Discord.ButtonBuilder().setCustomId("y7ghjuiojioujoj").setDisabled(true).setStyle(Discord.ButtonStyle.Success).setEmoji("🕊").setLabel("Game Ended"))
 
                     if (player1Choice === player2Choice) { // draw
                         if (this.endReply) {
                             const data = {
-                                embeds: [{
-                                    color: this.colors.drawEmbed,
+                                embeds: [new Discord.EmbedBuilder({
                                     title: this.drawEndTitle,
                                     description: this.drawEndDescription
                                         .replace(/{player1}/g, message.author.username)
                                         .replace(/{player1move}/g, player1Choice)
                                         .replace(/{player2}/g, player2.username)
                                         .replace(/{player2move}/g, player2Choice)
-                                }],
+                                }).setColor(this.colors.drawEmbed)],
                                 components: [row]
                             };
 
@@ -347,15 +338,15 @@ class rps {
                     } else if (winConditions[player2Choice] !== player1Choice) { // player 1 won
                         if (this.endReply) {
                             const data = {
-                                embeds: [{
-                                    color: this.colors.endEmbed,
+                                embeds: [new Discord.EmbedBuilder({
                                     title: this.endTitle.replace(/{winner}/g, message.author.username).replace(/{looser}/g, player2.username),
                                     description: this.endDescription
                                         .replace(/{winner}/g, message.author.username)
                                         .replace(/{winnermove}/g, player1Choice)
                                         .replace(/{looser}/g, player2.username || "Bot")
                                         .replace(/{loosermove}/g, player2Choice)
-                                }], components: [row]
+                                }).setColor(this.colors.endEmbed)],
+                                components: [row]
                             };
 
                             if (message.ephemeral) message.editReply(data);
@@ -370,8 +361,7 @@ class rps {
                     } else { // player 2 won
                         if (this.endReply) {
                             const data = {
-                                embeds: [{
-                                    color: this.colors.endEmbed,
+                                embeds: [new Discord.EmbedBuilder({
                                     title: this.endTitle
                                         .replace(/{looser}/g, message.author.username)
                                         .replace(/{winner}/g, player2.username),
@@ -380,7 +370,7 @@ class rps {
                                         .replace(/{loosermove}/g, player1Choice)
                                         .replace(/{winner}/g, player2.username || "Bot")
                                         .replace(/{winnermove}/g, player2Choice)
-                                }],
+                                }).setColor(this.colors.endEmbed)],
                                 components: [row]
                             };
 
@@ -398,10 +388,9 @@ class rps {
                     if (this.endReply) {
                         sent.edit({
                             components: [],
-                            embeds: [{
-                                color: this.colors.errorEmbed,
+                            embeds: [new Discord.EmbedBuilder({
                                 title: `I was unable to DM ${no}, so please open DM than try again.`
-                            }]
+                            }).setColor(this.colors.errorEmbed)]
                         })
                     }
 
